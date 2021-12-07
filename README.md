@@ -1,6 +1,6 @@
 # Around the U.S. Back End  
   
-## By Netaa-Hadat Itzhak  
+## By Neta-Hadat Itzhak  
   
 This project is a summary task for the "Back-End" module at Yandex's Full Stack course.
 It's still in progress, so code changes are still expected.
