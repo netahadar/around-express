@@ -22,8 +22,8 @@ module.exports.getAllCards = (req, res) => {
 
 // Create a new card
 module.exports.createCard = (req, res) => {
-  const { name, link } = req.body;
-  Card.create({ name, link, owner: req.user._id })
+  const { name, link, owner = req.user._id } = req.body;
+  Card.create({ name, link, owner })
     .then(() => {
       res.status(200).send({ message: 'card created successfully' });
     })
@@ -60,12 +60,13 @@ module.exports.likeCard = (req, res) => {
     { $addToSet: { likes: req.user._id } },
     { new: true },
   )
+    .orFail(createNotFoundError)
     .then((card) => {
       res.status(200).send(card.likes);
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(NOTFOUND_ERROR_CODE).send({ message: `${err.message}` });
+        res.status(INVALIDDATA_ERROR_CODE).send({ message: `${err.message}` });
         return;
       }
       res.status(DEFAULT_ERROR_CODE).send({ message: `${err.message}` });
@@ -79,12 +80,13 @@ module.exports.dislikeCard = (req, res) => {
     { $pull: { likes: req.user._id } },
     { new: true },
   )
+    .orFail(createNotFoundError)
     .then((card) => {
       res.status(200).send(card.likes);
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(NOTFOUND_ERROR_CODE).send({ message: `${err.message}` });
+        res.status(INVALIDDATA_ERROR_CODE).send({ message: `${err.message}` });
         return;
       }
       res.status(DEFAULT_ERROR_CODE).send({ message: `${err.message}` });

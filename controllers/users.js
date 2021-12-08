@@ -23,10 +23,11 @@ module.exports.getAllUsers = (req, res) => {
 // Get user by Id
 module.exports.getUserById = (req, res) => {
   User.findById(req.params.id)
+    .orFail(createNotFoundError)
     .then((chosenUser) => res.status(200).send(chosenUser))
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(NOTFOUND_ERROR_CODE).send({ message: `${err.message}` });
+        res.status(INVALIDDATA_ERROR_CODE).send({ message: `${err.message}` });
         return;
       }
       res.status(DEFAULT_ERROR_CODE).send({ message: `${err.message}` });
@@ -52,7 +53,7 @@ module.exports.createUser = (req, res) => {
 module.exports.updateUser = (req, res) => {
   const id = req.user._id;
   const { name, about } = req.body;
-  User.findByIdAndUpdate(id, { name, about }, { new: true })
+  User.findByIdAndUpdate(id, { name, about }, { new: true, runValidators: true })
     .orFail(createNotFoundError)
     .then((updatedUser) => {
       res.status(200).send({ message: `User ${updatedUser} updated successfuly` });
@@ -69,7 +70,7 @@ module.exports.updateUser = (req, res) => {
 module.exports.updateAvatar = (req, res) => {
   const id = req.user._id;
   const { avatar } = req.body;
-  User.findByIdAndUpdate(id, avatar, { new: true })
+  User.findByIdAndUpdate(id, avatar, { new: true, runValidators: true })
     .orFail(createNotFoundError)
     .then(() => {
       res.status(200).send({ message: 'Avatar updated successfuly' });
