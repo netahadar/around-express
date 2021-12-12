@@ -29,6 +29,8 @@ module.exports.getUserById = (req, res) => {
       if (err.name === 'CastError') {
         res.status(INVALIDDATA_ERROR_CODE).send({ message: `${err.message}` });
         return;
+      } if (err.name === 'Not Found') {
+        res.status(NOTFOUND_ERROR_CODE).send({ message: `${err.message}` });
       }
       res.status(DEFAULT_ERROR_CODE).send({ message: `${err.message}` });
     });

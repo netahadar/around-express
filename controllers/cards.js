@@ -10,7 +10,9 @@ const {
 module.exports.getAllCards = (req, res) => {
   Card.find({})
     .orFail(createNotFoundError)
-    .then((cardsData) => { res.status(200).send(JSON.parse(cardsData)); })
+    .then((cardsData) => {
+      res.status(200).send(JSON.parse(cardsData));
+    })
     .catch((err) => {
       if (err.name === 'Not Found') {
         res.status(NOTFOUND_ERROR_CODE).send({ message: `${err.message}` });
@@ -45,6 +47,9 @@ module.exports.deleteCard = (req, res) => {
       res.status(200).send('card has been deleted successfully');
     })
     .catch((err) => {
+      if (err.name === 'CastError') {
+        res.status(INVALIDDATA_ERROR_CODE).send({ message: `${err.message}` });
+      }
       if (err.name === 'Not Found') {
         res.status(NOTFOUND_ERROR_CODE).send({ message: `${err.message}` });
         return;
@@ -68,6 +73,9 @@ module.exports.likeCard = (req, res) => {
       if (err.name === 'CastError') {
         res.status(INVALIDDATA_ERROR_CODE).send({ message: `${err.message}` });
         return;
+      } if (err.name === 'Not Found') {
+        res.status(NOTFOUND_ERROR_CODE).send({ message: `${err.message}` });
+        return;
       }
       res.status(DEFAULT_ERROR_CODE).send({ message: `${err.message}` });
     });
@@ -87,6 +95,9 @@ module.exports.dislikeCard = (req, res) => {
     .catch((err) => {
       if (err.name === 'CastError') {
         res.status(INVALIDDATA_ERROR_CODE).send({ message: `${err.message}` });
+        return;
+      } if (err.name === 'Not Found') {
+        res.status(NOTFOUND_ERROR_CODE).send({ message: `${err.message}` });
         return;
       }
       res.status(DEFAULT_ERROR_CODE).send({ message: `${err.message}` });
